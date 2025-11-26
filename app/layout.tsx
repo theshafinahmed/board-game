@@ -11,6 +11,8 @@ export const viewport: Viewport = {
 
 import { ThemeProvider } from "@/components/theme-provider";
 
+import { ConvexClientProvider } from "@/components/ConvexClientProvider";
+
 export default function RootLayout({
     children,
 }: Readonly<{
@@ -19,14 +21,16 @@ export default function RootLayout({
     return (
         <html lang="en" suppressHydrationWarning>
             <body className={`antialiased`}>
-                <ThemeProvider
-                    attribute="data-theme"
-                    defaultTheme="system"
-                    enableSystem
-                    disableTransitionOnChange
-                >
-                    {children}
-                </ThemeProvider>
+                <ConvexClientProvider>
+                    <ThemeProvider
+                        attribute="data-theme"
+                        defaultTheme="system"
+                        enableSystem
+                        disableTransitionOnChange
+                    >
+                        {children}
+                    </ThemeProvider>
+                </ConvexClientProvider>
             </body>
         </html>
     );
