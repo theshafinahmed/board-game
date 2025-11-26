@@ -96,10 +96,14 @@ export default function GameBoard() {
         return validMoves.some(([r, c]) => r === row && c === col);
     };
 
+    // Coordinate system for perfect alignment (percentages)
+    const COL_POSITIONS = [10, 30, 70, 90];
+    const ROW_POSITIONS = [15, 50, 85];
+
     return (
-        <div className="flex flex-col items-center justify-center w-full max-w-4xl mx-auto p-4">
+        <div className="flex flex-col items-center justify-center w-full min-h-screen p-4">
             {/* Header / Status */}
-            <div className="w-full flex justify-end mb-4">
+            <div className="w-full max-w-2xl flex justify-end mb-4">
                 <ModeToggle />
             </div>
 
@@ -133,185 +137,107 @@ export default function GameBoard() {
             </div>
 
             {/* Game Board Container */}
-            <div className="relative p-8 md:p-12 bg-white/5 dark:bg-black/20 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl">
+            <div className="relative w-full max-w-[600px] aspect-[1.6/1] bg-white/5 dark:bg-black/20 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl">
                 {/* SVG Lines Layer */}
-                <svg
-                    className="absolute inset-0 w-full h-full pointer-events-none z-0 p-8 md:p-12"
-                    style={{ overflow: "visible" }}
-                >
-                    <defs>
-                        <linearGradient
-                            id="lineGradient"
-                            x1="0%"
-                            y1="0%"
-                            x2="100%"
-                            y2="0%"
-                        >
-                            <stop
-                                offset="0%"
-                                stopColor="var(--color-secondary)"
-                                stopOpacity="0.3"
-                            />
-                            <stop
-                                offset="100%"
-                                stopColor="var(--color-primary)"
-                                stopOpacity="0.3"
-                            />
-                        </linearGradient>
-                    </defs>
+                <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
+                    {/* Vertical Connections */}
+                    {[0, 1, 2, 3].map((col) => (
+                        <line
+                            key={`v-${col}`}
+                            x1={`${COL_POSITIONS[col]}%`}
+                            y1={`${ROW_POSITIONS[0]}%`}
+                            x2={`${COL_POSITIONS[col]}%`}
+                            y2={`${ROW_POSITIONS[2]}%`}
+                            stroke="var(--color-foreground)"
+                            strokeOpacity="0.2"
+                            strokeWidth="4"
+                            strokeLinecap="round"
+                        />
+                    ))}
 
-                    {/* Vertical Lines */}
+                    {/* Horizontal Row 0 (Gap in middle) */}
                     <line
-                        x1="0%"
-                        y1="0%"
-                        x2="0%"
-                        y2="100%"
-                        stroke="url(#lineGradient)"
-                        strokeWidth="4"
-                        strokeLinecap="round"
-                    />
-                    <line
-                        x1="25%"
-                        y1="0%"
-                        x2="25%"
-                        y2="100%"
-                        stroke="url(#lineGradient)"
-                        strokeWidth="4"
-                        strokeLinecap="round"
-                    />
-                    <line
-                        x1="75%"
-                        y1="0%"
-                        x2="75%"
-                        y2="100%"
-                        stroke="url(#lineGradient)"
-                        strokeWidth="4"
-                        strokeLinecap="round"
-                    />
-                    <line
-                        x1="100%"
-                        y1="0%"
-                        x2="100%"
-                        y2="100%"
-                        stroke="url(#lineGradient)"
-                        strokeWidth="4"
-                        strokeLinecap="round"
-                    />
-
-                    {/* Horizontal Lines - Row 0 */}
-                    <line
-                        x1="0%"
-                        y1="0%"
-                        x2="25%"
-                        y2="0%"
-                        stroke="url(#lineGradient)"
-                        strokeWidth="4"
-                        strokeLinecap="round"
-                    />
-                    <line
-                        x1="75%"
-                        y1="0%"
-                        x2="100%"
-                        y2="0%"
-                        stroke="url(#lineGradient)"
-                        strokeWidth="4"
-                        strokeLinecap="round"
-                    />
-
-                    {/* Horizontal Lines - Row 1 (The Bridge) */}
-                    <line
-                        x1="0%"
-                        y1="50%"
-                        x2="100%"
-                        y2="50%"
+                        x1={`${COL_POSITIONS[0]}%`}
+                        y1={`${ROW_POSITIONS[0]}%`}
+                        x2={`${COL_POSITIONS[1]}%`}
+                        y2={`${ROW_POSITIONS[0]}%`}
                         stroke="var(--color-foreground)"
                         strokeOpacity="0.2"
-                        strokeWidth="6"
-                        strokeLinecap="round"
-                    />
-
-                    {/* Horizontal Lines - Row 2 */}
-                    <line
-                        x1="0%"
-                        y1="100%"
-                        x2="25%"
-                        y2="100%"
-                        stroke="url(#lineGradient)"
                         strokeWidth="4"
                         strokeLinecap="round"
                     />
                     <line
-                        x1="75%"
-                        y1="100%"
-                        x2="100%"
-                        y2="100%"
-                        stroke="url(#lineGradient)"
+                        x1={`${COL_POSITIONS[2]}%`}
+                        y1={`${ROW_POSITIONS[0]}%`}
+                        x2={`${COL_POSITIONS[3]}%`}
+                        y2={`${ROW_POSITIONS[0]}%`}
+                        stroke="var(--color-foreground)"
+                        strokeOpacity="0.2"
+                        strokeWidth="4"
+                        strokeLinecap="round"
+                    />
+
+                    {/* Horizontal Row 1 (The Bridge - Fully Connected) */}
+                    <line
+                        x1={`${COL_POSITIONS[0]}%`}
+                        y1={`${ROW_POSITIONS[1]}%`}
+                        x2={`${COL_POSITIONS[3]}%`}
+                        y2={`${ROW_POSITIONS[1]}%`}
+                        stroke="var(--color-foreground)"
+                        strokeOpacity="0.2"
+                        strokeWidth="4"
+                        strokeLinecap="round"
+                    />
+
+                    {/* Horizontal Row 2 (Gap in middle) */}
+                    <line
+                        x1={`${COL_POSITIONS[0]}%`}
+                        y1={`${ROW_POSITIONS[2]}%`}
+                        x2={`${COL_POSITIONS[1]}%`}
+                        y2={`${ROW_POSITIONS[2]}%`}
+                        stroke="var(--color-foreground)"
+                        strokeOpacity="0.2"
+                        strokeWidth="4"
+                        strokeLinecap="round"
+                    />
+                    <line
+                        x1={`${COL_POSITIONS[2]}%`}
+                        y1={`${ROW_POSITIONS[2]}%`}
+                        x2={`${COL_POSITIONS[3]}%`}
+                        y2={`${ROW_POSITIONS[2]}%`}
+                        stroke="var(--color-foreground)"
+                        strokeOpacity="0.2"
                         strokeWidth="4"
                         strokeLinecap="round"
                     />
                 </svg>
 
-                {/* Nodes Grid */}
-                <div className="relative z-10 grid grid-rows-3 gap-y-16 md:gap-y-24">
-                    {[0, 1, 2].map((row) => (
+                {/* Nodes */}
+                {board.map((row, rIndex) =>
+                    row.map((piece, cIndex) => (
                         <div
-                            key={row}
-                            className="flex justify-between w-[300px] md:w-[500px] mx-auto relative"
+                            key={`${rIndex}-${cIndex}`}
+                            className="absolute"
+                            style={{
+                                left: `${COL_POSITIONS[cIndex]}%`,
+                                top: `${ROW_POSITIONS[rIndex]}%`,
+                                transform: "translate(-50%, -50%)",
+                            }}
                         >
-                            {/* Left Side (Col 0, 1) */}
-                            <div className="flex gap-16 md:gap-24">
-                                <Node
-                                    row={row}
-                                    col={0}
-                                    piece={board[row][0]}
-                                    isSelected={
-                                        selectedPiece?.[0] === row &&
-                                        selectedPiece?.[1] === 0
-                                    }
-                                    isValidTarget={isValidTarget(row, 0)}
-                                    onClick={() => handleNodeClick(row, 0)}
-                                />
-                                <Node
-                                    row={row}
-                                    col={1}
-                                    piece={board[row][1]}
-                                    isSelected={
-                                        selectedPiece?.[0] === row &&
-                                        selectedPiece?.[1] === 1
-                                    }
-                                    isValidTarget={isValidTarget(row, 1)}
-                                    onClick={() => handleNodeClick(row, 1)}
-                                />
-                            </div>
-
-                            {/* Right Side (Col 2, 3) */}
-                            <div className="flex gap-16 md:gap-24">
-                                <Node
-                                    row={row}
-                                    col={2}
-                                    piece={board[row][2]}
-                                    isSelected={
-                                        selectedPiece?.[0] === row &&
-                                        selectedPiece?.[1] === 2
-                                    }
-                                    isValidTarget={isValidTarget(row, 2)}
-                                    onClick={() => handleNodeClick(row, 2)}
-                                />
-                                <Node
-                                    row={row}
-                                    col={3}
-                                    piece={board[row][3]}
-                                    isSelected={
-                                        selectedPiece?.[0] === row &&
-                                        selectedPiece?.[1] === 3
-                                    }
-                                    isValidTarget={isValidTarget(row, 3)}
-                                    onClick={() => handleNodeClick(row, 3)}
-                                />
-                            </div>
+                            <Node
+                                row={rIndex}
+                                col={cIndex}
+                                piece={piece}
+                                isSelected={
+                                    selectedPiece?.[0] === rIndex &&
+                                    selectedPiece?.[1] === cIndex
+                                }
+                                isValidTarget={isValidTarget(rIndex, cIndex)}
+                                onClick={() => handleNodeClick(rIndex, cIndex)}
+                            />
                         </div>
-                    ))}
-                </div>
+                    ))
+                )}
             </div>
 
             {/* Winner Overlay */}
@@ -436,12 +362,7 @@ function Node({
                             isSelected &&
                                 "ring-4 ring-white dark:ring-white/50 scale-110"
                         )}
-                    >
-                        {/* Inner detail for "Squid Game" vibe */}
-                        <div className="absolute inset-0 flex items-center justify-center text-white/50 font-bold text-xs">
-                            {piece === "purple" ? "▲" : "●"}
-                        </div>
-                    </motion.div>
+                    />
                 )}
             </AnimatePresence>
         </div>
