@@ -57,11 +57,22 @@ function checkWinCondition(board: Board): Player | null {
     return null;
 }
 
+function generateInviteCode(): string {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let result = "";
+    for (let i = 0; i < 6; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+}
+
 // --- Convex Functions ---
 
 export const create = mutation({
     args: { playerToken: v.string() },
     handler: async (ctx, args) => {
+        const inviteCode = generateInviteCode();
+        console.log("Creating game with invite code:", inviteCode);
         const gameId = await ctx.db.insert("games", {
             board: INITIAL_BOARD,
             currentPlayer: "purple",
@@ -69,26 +80,33 @@ export const create = mutation({
             playerPurple: args.playerToken,
             playerGreen: null,
             status: "waiting",
+            inviteCode: inviteCode,
         });
-        return gameId;
+        return { gameId, inviteCode };
     },
 });
 
 export const join = mutation({
-    args: { gameId: v.id("games"), playerToken: v.string() },
+    args: { inviteCode: v.string(), playerToken: v.string() },
     handler: async (ctx, args) => {
-        const game = await ctx.db.get(args.gameId);
+        const game = await ctx.db
+            .query("games")
+            .withIndex("by_invite_code", (q) =>
+                q.eq("inviteCode", args.inviteCode)
+            )
+            .first();
+
         if (!game) throw new Error("Game not found");
         if (game.status !== "waiting")
             throw new Error("Game is not waiting for players");
         if (game.playerPurple === args.playerToken)
-            throw new Error("You are already in this game");
+            return { gameId: game._id, role: "purple" }; // Re-join as creator
 
-        await ctx.db.patch(args.gameId, {
+        await ctx.db.patch(game._id, {
             playerGreen: args.playerToken,
             status: "playing",
         });
-        return "green";
+        return { gameId: game._id, role: "green" };
     },
 });
 
@@ -159,5 +177,20 @@ export const move = mutation({
             winner: winner,
             status: winner ? "finished" : "playing",
         });
+    },
+});
+
+export const leave = mutation({
+    args: { gameId: v.id("games"), playerToken: v.string() },
+    handler: async (ctx, args) => {
+        const game = await ctx.db.get(args.gameId);
+        if (!game) return; // Already deleted or doesn't exist
+
+        // Logic: If game is finished, delete it.
+        // If game is waiting and creator leaves, delete it.
+        // If game is playing and one leaves... maybe forfeit? For now, just delete to save space as requested.
+
+        // Ideally we'd have a more robust system, but user asked to "delete data to save space".
+        await ctx.db.delete(args.gameId);
     },
 });

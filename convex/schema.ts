@@ -15,5 +15,6 @@ export default defineSchema({
             v.literal("playing"),
             v.literal("finished")
         ),
-    }),
+        inviteCode: v.string(), // Short 6-char code
+    }).index("by_invite_code", ["inviteCode"]),
 });
